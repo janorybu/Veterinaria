@@ -53,6 +53,10 @@ namespace Veterinaria.BL
             _contexto.Categorias.Remove(categoria);
             _contexto.SaveChanges();
         }
+        public object ObtenerCategorias(int id)  //DEMO
+        {
+            throw new NotImplementedException();   //DEMO
         
+        }
     }
 }

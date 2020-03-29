@@ -12,6 +12,8 @@ namespace Veterinaria.BL
         public Productos()
         {
             Activo = true;
+            Precio = 1;
+            
         }
 
         public int Id { get; set; }

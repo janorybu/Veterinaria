@@ -32,8 +32,7 @@ namespace Veterinaria.WebAdmin.Controllers
             var nuevoProducto = new Productos();
             var categorias = _categoriasBL.ObtenerCategorias();
 
-            ViewBag.CategoriaId = 
-                new SelectList(categorias, "Id", "Descripcion"  );
+            ViewBag.CategoriaId = new SelectList(categorias, "Id", "Descripcion");
 
             return View(nuevoProducto);
         }
@@ -56,30 +55,39 @@ namespace Veterinaria.WebAdmin.Controllers
                 _productosBL.GuardarProductos(productos);
 
                 return RedirectToAction("Index");
-
             }
 
             var categorias = _categoriasBL.ObtenerCategorias();
 
-            ViewBag.CategoriaId =
-                new SelectList(categorias, "Id", "Descripcion");
+            ViewBag.CategoriaId = new SelectList(categorias, "Id", "Descripcion");
+
             return View(productos);
             
         }
+
+        private string GuardarImagen(HttpPostedFileBase imagen)
+        {
+            string path = Server.MapPath("~/Imagenes/" + imagen.FileName);
+            imagen.SaveAs(path);
+
+            return "/Imagenes/" + imagen.FileName;
+
+        }
+
+
 
         public ActionResult Editar(int id)
         {
             var productos = _productosBL.ObtenerProductos(id);
             var categorias = _categoriasBL.ObtenerCategorias();
 
-            ViewBag.CategoriaId =
-                new SelectList(categorias, "Id", "Descripcion", productos.CategoriaId);
+            ViewBag.CategoriaId = new SelectList(categorias, "Id", "Descripcion", productos.CategoriaId);
 
             return View(productos);
         }
 
         [HttpPost]
-        public ActionResult Editar(Productos productos)
+        public ActionResult Editar(Productos productos, HttpPostedFileBase imagen)  //Agregue HTT IMAG
         {
             if (ModelState.IsValid)
             {
@@ -87,6 +95,10 @@ namespace Veterinaria.WebAdmin.Controllers
                 {
                     ModelState.AddModelError("CategoriaId", "Seleccione una categoria");
                     return View(productos);
+                }
+                if (imagen != null) // AGREGUE
+                {
+                    productos.UrlImagen = GuardarImagen(imagen); //AGREGUE
                 }
                 _productosBL.GuardarProductos(productos);
 
@@ -96,12 +108,12 @@ namespace Veterinaria.WebAdmin.Controllers
 
             var categorias = _categoriasBL.ObtenerCategorias();
 
-            ViewBag.CategoriaId =
-                new SelectList(categorias, "Id", "Descripcion");
+            ViewBag.CategoriaId = new SelectList(categorias, "Id", "Descripcion");
+
             return View(productos);
         }
 
-        public ActionResult Detalle(int id)
+        public ActionResult Detalles(int id)
         {
             var producto = _productosBL.ObtenerProductos(id);
 
@@ -119,15 +131,10 @@ namespace Veterinaria.WebAdmin.Controllers
         public ActionResult Eliminar(Productos productos)
         {
             _productosBL.EliminarProductos(productos.Id);
+
             return RedirectToAction("Index");
         }
 
-        private string GuardarImagen(HttpPostedFileBase imagen)
-        {
-            string path = Server.MapPath("~/Imagenes/" + imagen.FileName);
-            imagen.SaveAs(path);
-
-            return "/Imagenes/" + imagen.FileName;
+   
         }
     }
-}

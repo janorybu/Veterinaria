@@ -9,7 +9,6 @@ namespace Veterinaria.BL
     public class ProductosBL
     {
         Contexto _contexto;
-
         public List<Productos> ListadeProductos { get; set; }
 
         public ProductosBL()
@@ -23,8 +22,35 @@ namespace Veterinaria.BL
 
             ListadeProductos = _contexto.Productos
                 .Include("Categoria")
+                .OrderBy(r => r.Categoria.Descripcion) //AGREGADO
+                .ThenBy(r => r.Descripcion)            //AGREGADO
                 .ToList();
 
+
+            return ListadeProductos;
+        }
+
+        public List<Productos> ObtenerProductosActivo()
+        {
+
+            ListadeProductos = _contexto.Productos
+                .Include("Categoria")
+                .Where(r => r.Activo == true)
+                .OrderBy(r => r.Categoria.Descripcion) //AGREGADO
+                .ThenBy(r => r.Descripcion)            //AGREGADO
+                .ToList();
+
+
+            return ListadeProductos;
+        }
+
+        public List<Productos> ObtenerProductosActivos()
+        {
+            ListadeProductos = _contexto.Productos
+                   .Include("Categoria")
+                   .Where(r => r.Activo == true)
+                   .OrderBy(r => r.Descripcion)
+                   .ToList();
 
             return ListadeProductos;
         }
@@ -37,13 +63,13 @@ namespace Veterinaria.BL
             } else
             {
                 var productosExistente = _contexto.Productos.Find(productos.Id);
+
                 productosExistente.Descripcion = productos.Descripcion;
                 productosExistente.CategoriaId = productos.CategoriaId;
                 productosExistente.Precio = productos.Precio;
-                if (productos.UrlImagen != null)
-                {
-                    productosExistente.UrlImagen = productos.UrlImagen;
-                }
+                
+                productosExistente.UrlImagen = productos.UrlImagen;
+                
             }
             
             _contexto.SaveChanges();
@@ -51,7 +77,8 @@ namespace Veterinaria.BL
 
         public Productos ObtenerProductos(int id)
         {
-            var productos = _contexto.Productos.Include("Categoria").FirstOrDefault(p => p.Id == id);
+            var productos = _contexto.Productos
+                .Include("Categoria").FirstOrDefault(p => p.Id == id);
 
             return productos;
         }
